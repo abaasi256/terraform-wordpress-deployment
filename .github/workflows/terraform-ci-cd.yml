@@ -52,10 +52,10 @@ jobs:
         fi
 
     - name: Terraform Plan
-      run: terraform plan -var 'db_password=${{ secrets.DB_PASSWORD }}'
+      run: terraform plan -var 'db_password=${{ secrets.DB_PASSWORD }}' -var 'key_name=${{ secrets.KEY_NAME }}'
 
     - name: Terraform Apply
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-      run: terraform apply -auto-approve -var 'db_password=${{ secrets.DB_PASSWORD }}'
+      run: terraform apply -auto-approve -var 'db_password=${{ secrets.DB_PASSWORD }}' -var 'key_name=${{ secrets.KEY_NAME }}'
 
     timeout-minutes: 30  # Increase timeout as needed
