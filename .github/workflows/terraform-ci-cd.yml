@@ -1,27 +1,61 @@
-name: Terraform Destroy on Push
+name: 'Terraform CI/CD DESTROY'
 
 on:
   push:
     branches:
-      - master  # or your main branch name
+      - master
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: write  # Changed to write to allow auto-formatting commits
 
 jobs:
-  destroy:
+  terraform:
+    name: 'Terraform'
     runs-on: ubuntu-latest
+    environment: production
+
+    defaults:
+      run:
+        shell: bash
 
     steps:
-    - name: Checkout repository
+    - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Set up Terraform
+    - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
       with:
-        terraform_version: 1.0.0  # Set your required Terraform version
+        terraform_version: '1.5.0'
 
-    - name: Initialize Terraform
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Terraform Init
       run: terraform init
 
-    - name: Run Terraform Destroy
-      run: terraform destroy -auto-approve
-      env:
-        TF_VAR_variable_name: ${{ secrets.TF_VAR_variable_value }}
+    - name: Terraform Format
+      run: |
+        terraform fmt
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'actions@github.com'
+        if [[ -n $(git status --porcelain) ]]; then
+          git add -A
+          git commit -m "chore: format terraform files"
+          git push
+        fi
+
+    - name: Terraform Plan
+      run: terraform plan -var 'db_password=${{ secrets.DB_PASSWORD }}' -var 'key_name=${{ secrets.KEY_NAME }}'
+
+    - name: Terraform Destroy
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      run: terraform apply -auto-approve -var 'db_password=${{ secrets.DB_PASSWORD }}' -var 'key_name=${{ secrets.KEY_NAME }}'
+
+    timeout-minutes: 30  # Increase timeout as needed
