@@ -1,25 +1,12 @@
-name: 'Terraform CI/CD'
+name: 'Terraform CI/CD with Destroy'
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
-
-permissions:
-  contents: write  # Changed to write to allow auto-formatting commits
+  workflow_dispatch:  # Allows manual triggering of the workflow
 
 jobs:
-  terraform:
-    name: 'Terraform'
+  destroy:
+    name: 'Terraform Destroy'
     runs-on: ubuntu-latest
-    environment: production
-
-    defaults:
-      run:
-        shell: bash
 
     steps:
     - name: Checkout
@@ -40,22 +27,5 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
-    - name: Terraform Format
-      run: |
-        terraform fmt
-        git config --global user.name 'GitHub Actions'
-        git config --global user.email 'actions@github.com'
-        if [[ -n $(git status --porcelain) ]]; then
-          git add -A
-          git commit -m "chore: format terraform files"
-          git push
-        fi
-
-    - name: Terraform Plan
-      run: terraform plan -var 'db_password=${{ secrets.DB_PASSWORD }}' -var 'key_name=${{ secrets.KEY_NAME }}'
-
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-      run: terraform apply -auto-approve -var 'db_password=${{ secrets.DB_PASSWORD }}' -var 'key_name=${{ secrets.KEY_NAME }}'
-
-    timeout-minutes: 30  # Increase timeout as needed
+    - name: Terraform Destroy
+      run: terraform destroy -auto-approve -var 'db_password=${{ secrets.DB_PASSWORD }}' -var 'key_name=${{ secrets.KEY_NAME }}'
