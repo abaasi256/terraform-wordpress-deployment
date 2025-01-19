@@ -1,7 +1,7 @@
 name: 'Terraform CI/CD with Destroy'
 
 on:
-  workflow_dispatch:  # Allows manual triggering of the workflow
+  workflow_dispatch:  # Allows manual triggering of the workflow.
 
 jobs:
   destroy:
