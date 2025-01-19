@@ -130,7 +130,7 @@ resource "aws_instance" "wordpress_instance" {
   vpc_security_group_ids      = [aws_security_group.wordpress_sg.id]
   key_name                    = var.key_name
   associate_public_ip_address = true
-  
+
   tags = {
     Name = "wordpress-instance"
   }
@@ -189,7 +189,7 @@ resource "aws_instance" "wordpress_instance" {
 resource "aws_db_subnet_group" "wordpress_db_subnet_group" {
   name       = "wordpress-db-subnet-group"
   subnet_ids = [aws_subnet.wordpress_subnet.id, aws_subnet.wordpress_subnet_2.id]
-  
+
   tags = {
     Name = "wordpress-db-subnet-group"
   }
@@ -199,22 +199,22 @@ resource "aws_db_instance" "wordpress_db" {
   identifier           = "wordpress-db"
   allocated_storage    = 20
   storage_type         = "gp2"
-  engine              = "mysql"
-  engine_version      = "5.7"
-  instance_class      = "db.t3.micro"
-  db_name             = var.db_name
-  username            = var.db_user
-  password            = var.db_password
+  engine               = "mysql"
+  engine_version       = "5.7"
+  instance_class       = "db.t3.micro"
+  db_name              = var.db_name
+  username             = var.db_user
+  password             = var.db_password
   parameter_group_name = "default.mysql5.7"
-  skip_final_snapshot = true
-  
+  skip_final_snapshot  = true
+
   vpc_security_group_ids = [aws_security_group.wordpress_db_sg.id]
   db_subnet_group_name   = aws_db_subnet_group.wordpress_db_subnet_group.name
-  
+
   backup_retention_period = 7
-  multi_az               = false
-  publicly_accessible    = false
-  
+  multi_az                = false
+  publicly_accessible     = false
+
   tags = {
     Name = "wordpress-db"
   }
