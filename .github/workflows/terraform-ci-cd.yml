@@ -1,4 +1,4 @@
-name: 'Terraform CI/CD DESTROY'
+name: 'Terraform CI/CD with Destroy'
 
 on:
   push:
@@ -7,13 +7,14 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch:  # Allows manual triggering for the destroy job
 
 permissions:
   contents: write  # Changed to write to allow auto-formatting commits
 
 jobs:
   terraform:
-    name: 'Terraform'
+    name: 'Terraform Apply'
     runs-on: ubuntu-latest
     environment: production
 
@@ -54,8 +55,34 @@ jobs:
     - name: Terraform Plan
       run: terraform plan -var 'db_password=${{ secrets.DB_PASSWORD }}' -var 'key_name=${{ secrets.KEY_NAME }}'
 
-    - name: Terraform Destroy
+    - name: Terraform Apply
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: terraform apply -auto-approve -var 'db_password=${{ secrets.DB_PASSWORD }}' -var 'key_name=${{ secrets.KEY_NAME }}'
 
     timeout-minutes: 30  # Increase timeout as needed
+
+  destroy:
+    name: 'Terraform Destroy'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: '1.5.0'
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Destroy
+      run: terraform destroy -auto-approve -var 'db_password=${{ secrets.DB_PASSWORD }}' -var 'key_name=${{ secrets.KEY_NAME }}'
