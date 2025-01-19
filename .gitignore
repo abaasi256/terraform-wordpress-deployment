@@ -1,0 +1,21 @@
+echo '# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Provider lock file
+.terraform.lock.hcl
+
+# Terraform variables file containing secrets
+*.tfvars
+*.tfvars.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc' > .gitignore
