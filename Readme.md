@@ -1,7 +1,7 @@
 # WordPress Deployment on AWS using Terraform
 
 **Author**: [Abaasi](https://www.linkedin.com/in/abaasi-k-b79420340)  
-**GitHub**: [[Your GitHub Profile Link](https://github.com/abaasi256)]  
+**GitHub**: [[Abaasi256](https://github.com/abaasi256)]  
 **LinkedIn**: https://www.linkedin.com/in/abaasi-k-b79420340
 
 ---
@@ -18,17 +18,8 @@ The infrastructure includes:
 
 ## **Architecture Diagram**
 Below is the architectural diagram of the deployment:
-
-graph TD
-    A[User] -->|fa:fa-internet-explorer| B[Internet Gateway]
-    B -->|fa:fa-server| C[EC2 Instance]
-    C -->|fa:fa-globe| D[Apache + PHP 8.x + WordPress]
-    C -->|fa:fa-database| E[RDS MySQL Database]
-    C -->|fa:fa-shield| F[Security Group]
-    F -->|fa:fa-lock| G[Allow HTTP, HTTPS, SSH]
-    E -->|fa:fa-sitemap| H[Subnet Group]
-    H -->|fa:fa-cloud| I[Subnet 1]
-    H -->|fa:fa-cloud| J[Subnet 2]
+![architectural diagram](screenshots/architectural-diagram.png)  
+*Description*: Diagram of `architectural diagram` Infrastructure.
 
 ## **Features**
 - **Infrastructure as Code**: Automated provisioning using Terraform.
